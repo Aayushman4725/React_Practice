@@ -1,0 +1,425 @@
+React Tutorial
+
+Used for single page application (SPA) -> index.html
+Extension = Single React Snippets 
+			settings->emmet->Include Language
+				item-javascript
+				key-javascriptreact
+
+Creating React applications
+Code - npx create-react-app (project-name)
+
+Inside src:
+	index.js = contains the App.js which is rendered in index.html
+
+	App.js = It is the root component where other components are stacked together itself being the root
+
+package.json = contains the scripts and dependencies used in the project
+
+Start the project
+	npm run start
+
+if node modules is deleted to reinstall it - npm install
+
+Components
+
+	Contains:
+		Templae
+		logic(JS Logic)
+
+By default there is only one component call App being rendered inside the index.js which is from App.js and is being shown through index.html
+
+In a component the function name should start with uppercase
+
+We user jsx to create the component template
+
+In jsx class is reffered to as className for eg <div className = "App"></div>
+
+Shortcut to create class = div.(class_name) : eg : div.content + press TAB
+
+Always export the component for eg: export default App;
+Them we can import it in the index.js for eg: import App from './App';
+
+
+Dynamic value in templates/component
+
+use curly braces for eg: 
+const title = 'Welcome'
+<h1>{ title }</h1>
+
+We cannot output Boolean or object
+eg const person = {name:'yoshi', age:30};
+
+<p>{ person }</p> //this will show error
+
+<p> {[1,2,3,4,5]} </p> //this shows as a string 12345
+
+we can also put in built function
+<p> {Math.random() *10 }</p> //this will load random number every time the page is reloaded
+we can also use links dynamically in anchor tag
+const link = 'www.google.com'
+<a href = {link}>Google site</a>
+
+In a react project the components are structured as a tree  where App.js is the root component and the other components are nested.
+
+
+For eg we create a component Navbar.js
+
+shortcut: sfc + Press TAB //creates an arrow function , we have to name the function for eg Navbar
+
+After creating the component export it and import it in the App.js,
+Then, put it inside the div of App as <Navbar />
+
+Similarly create other components: Home
+
+
+Adding Styles/CSS
+By default there already is App.css present in the App.js
+There also is index.css which we are going to use as out css file
+So, delete the App.css as an error will occur if it is not deleted. We use index.css for style the templates which is imported in index.js so that all the component uses it.
+
+
+If we want to  further style each tag for eg in \
+<a href="/create" style{{
+color: "white",
+backgroundColor: "Red"
+}}
+>New BLog</a>
+This is called inline styling
+
+
+Click Events
+To handle click events inside the componets we use onClick attribute.
+
+Eg: Inside the component home
+const handleClick = (e) => {
+console.log('Hello', e);
+} 
+
+return(
+<div className = "home">
+	<h2>Homepage<h2>
+	<button onClick = {handleClick}>Click me</button>
+</div>
+);
+
+In the above code when the click me button is pressed the hello string will be printed along with the e which is the event object that is created by default in every function is printed in the console . The object is e is the first parameter in the function since there are no other parameters.
+
+If we want to add other parameters such as name to show Hello, Aayushman.
+
+const handleClick = (e) => {
+console.log('Hello', e);
+} 
+
+const handleClickAgain = (name , e) => {
+console.log('hello' + name, e.target); // target is an attribute of object e
+}
+ +
+return(
+<div className = "home">
+	<h2>Homepage<h2>
+	<button onClick = {handleClick}>Click me</button>
+	<button onClick = {(e) =>handleClickAgain('aayushman', e)}>Click me Again</button>
+</div>
+);
+
+In the above code, if we put the handleClickAgain function along with the parameters directly the function would be intiated without clicking the button since any paranthesis invokes the function.So, we put the function handleClickAgain inside another anonnymous function (function without a name) which doesnt contain the parameter with paranthesis so, only when the button is clicked will the function be invoked.
+
+
+
+Using States
+If we want the values inside the tag for eg:<p>{ name }</p> to be reactive i.e if we use a click event to change its value from initial value we have to change its state.
+
+For eg:
+
+import { useState } from "react";
+
+
+const Home = () => {
+    const name = 'mario'
+    const age =  25
+
+    const handleClick = () => {
+        name = 'luigi'
+        age = 30
+    }
+    return (  
+        <div className="home">
+            <h2>Home Page</h2>
+            <p>Welcome {name}, you are {age} years old.</p>
+            <button onClick= {handleClick}>Next</button>
+        </div>
+    );
+}
+ 
+export default Home;
+
+Here in the above code if we click Next the name should be changed to Luigi and age should change to 30 but even if the name and age is changed the change wont be rendered in the page, but if we print it in the console the change wil be shown
+
+This is because the component is not reactive. 
+For the component to be reactive we use the useState hook
+
+For eg:
+
+import { useState } from "react";
+
+
+const Home = () => {
+    const [name, setName] = useState('mario');
+    const [age, setAge] = useState(25); 
+
+    const handleClick = () => {
+        setName('luigi');
+        setAge(30);
+    }
+    return (  
+        <div className="home">
+            <h2>Home Page</h2>
+            <p>Welcome {name}, you are {age} years old.</p>
+            <button onClick= {handleClick}>Next</button>
+        </div>
+    );
+}
+ 
+export default Home;
+
+In the above code we import useState from reat and used it to make the component reactive
+
+To use the useState hook we keep it inside a array containing the variable that stores the value for eg : name and a function that changes the value of the variable and allows it to reflect it in the page for eg setName
+
+Now, the component is reactive.
+
+
+React Developer tool - it is an chrome extension
+
+Outputting Lists
+
+Now to output a list of objects in this case blogs we use the useState hook . As usual we initiate a array with variable named blogs and function named setBlogs.
+
+Then inside the useState function we addan array of objects whichare different blogs having their unique key i.e id.
+
+To display these blogs in the page we first use the variable blogs as {blogs}
+
+To show all the blogs contained in the array we use the in built function map as {blogs.map((blog)=> (
+))}
+
+For eg:
+
+import { useState } from "react";
+
+
+const Home = () => {
+    const [blogs, setBlogs] = useState([
+        { title: 'My new website', body: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.', author: 'mario', id: 1 },
+        { title: 'Welcome party!', body: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.', author: 'yoshi', id: 2 },
+        { title: 'Web dev top tips', body: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.', author: 'mario', id: 3 }
+    ]);
+
+
+    return (  
+        <div className="home">
+            <h2>Home Page</h2>
+            {blogs.map((blog) => (
+                <div className="blog-preview" key = {blog.id}>
+                    <h2>{blog.title}</h2>
+                    <p>{blog.body}</p>
+                    <p>Written By {blog.author}</p>
+                </div>
+            ))}
+        </div>
+    );
+}
+ 
+export default Home;
+
+In the above code we use map function to iterate through the list of objects.
+In order to show the object we need to add a unique identifier in the tag div which is the key. 
+ 
+the key should be unique for each object so we chose id as the key 
+
+then we can render the attributes of each objects as shown above.
+
+
+##Props
+It  is a way to pass the data from one component to another component 
+
+Now that we have rendered the list of blogs in the home page, the same list could be needed in another pages as well so we make a separate component to list the blogs.
+
+So, we make the BlogList.js component 
+
+const BlogList = (props) => {
+    const blogs = props.blogs;
+    const title = props.title;
+    return ( 
+        <div className="blog-list">
+            <h2>{title}</h2>
+            {blogs.map((blog) => (
+                <div className="blog-preview" key = {blog.id}>
+                    <h2>{blog.title}</h2>
+                    <p>{blog.body}</p>
+                    <p>Written By {blog.author}</p>
+                </div>
+            ))}
+        </div>
+     );
+}
+ 
+export default BlogList;
+
+In the above code we can see that everthing is the same as the home page to render the blog list , except the data is not present. But still the blogs variable is present.
+
+Now , In the home.js we can put the BlogList component as <BlogList /> intead of the whole code
+
+for eg :
+
+import { useState } from "react";
+import BlogList from "./BlogList";
+
+const Home = () => {
+    const [blogs, setBlogs] = useState([
+        { title: 'My new website', body: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.', author: 'mario', id: 1 },
+        { title: 'Welcome party!', body: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.', author: 'yoshi', id: 2 },
+        { title: 'Web dev top tips', body: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.', author: 'mario', id: 3 }
+    ]);
+
+
+    return (  
+        <div className="home">
+            <h2>Home Page</h2>
+            <BlogList blogs={blogs} title = "All Blogs!!!" />
+        </div>
+    );
+}
+ 
+export default Home;
+
+So, now the code mentioning the variable blogs is in BlogList.js but the data of blogs is still in this Home.js
+
+to use this data we use props
+
+In the BlogList.js, we add props as the parameter as shown above in the BlogList.js
+Then we can add the blogs and title as the props as shown above
+
+Then, in the Home.js we can add the blogs and title as the parameter in the BlogList component as <BlogList blogs = { blogs } title = "All Blogs"/>
+
+In the simiar way we use the data contained in different page and render it to the same component using the props
+
+There is more simpler way to use this, which is by destructuring the props without having to initiate the props separately
+
+For eg:
+
+const BlogList = ({blogs,title}) => {
+    
+    return ( 
+        <div className="blog-list">
+            <h2>{title}</h2>
+            {blogs.map((blog) => (
+                <div className="blog-preview" key = {blog.id}>
+                    <h2>{blog.title}</h2>
+                    <p>{blog.body}</p>
+                    <p>Written By {blog.author}</p>
+                </div>
+            ))}
+        </div>
+     );
+}
+ 
+export default BlogList;
+
+we can directly add the blogs and title as a parameter using the curly braces as dynamic data.
+
+##Reusing the components
+Now we can reuse the BlogList component to show datas for different conditions.
+For eg: we want a separate list of blogs whose author is mario for that we can use the BlogList component again , but instead of directly using blogs we filter the blogs to show the blogs which is written by mario.
+For this we user the filter function which uses a call back function similar to map
+
+For eg:
+
+import { useState } from "react";
+import BlogList from "./BlogList";
+
+const Home = () => {
+    const [blogs, setBlogs] = useState([
+        { title: 'My new website', body: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.', author: 'mario', id: 1 },
+        { title: 'Welcome party!', body: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.', author: 'yoshi', id: 2 },
+        { title: 'Web dev top tips', body: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.', author: 'mario', id: 3 }
+    ]);
+
+
+    return (  
+        <div className="home">
+            <h2>Home Page</h2>
+            <BlogList blogs={blogs} title = "All Blogs!!!" />
+            <BlogList blogs={blogs.filter((blog)=>(blog.author === 'mario'))} title = "Mario's Blogs!!!" />
+        </div>
+    );
+}
+ 
+export default Home;
+
+In the above code we have rendered two blog lists one containing all the blogs and another filtering mario's blog
+
+
+##Using functions as props
+Now, We want to delete the blog.
+For that we first add the delete blog button in the bloglist component
+
+For eg:
+const BlogList = ({blogs,title,handleDelete}) => {
+    
+    return ( 
+        <div className="blog-list">
+            <h2>{title}</h2>
+            {blogs.map((blog) => (
+                <div className="blog-preview" key = {blog.id}>
+                    <h2>{blog.title}</h2>
+                    <p>{blog.body}</p>
+                    <p>Written By {blog.author}</p>
+                    <button onClick ={() => handleDelete(blog.id)}>Delete Blog</button>
+                </div>
+            ))}
+        </div>
+     );
+}
+ 
+export default BlogList;
+
+Then we write the code for handleDelete function in the page where the data is present.
+In this case the data is present in Home.js
+
+So we write the code 
+For eg :
+
+import { useState } from "react";
+import BlogList from "./BlogList";
+
+const Home = () => {
+    const [blogs, setBlogs] = useState([
+        { title: 'My new website', body: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.', author: 'mario', id: 1 },
+        { title: 'Welcome party!', body: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.', author: 'yoshi', id: 2 },
+        { title: 'Web dev top tips', body: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.', author: 'mario', id: 3 }
+    ]);
+
+    const handleDelete = (id) => {
+        const newBlogs = blogs.filter(blog => blog.id !== id);
+        setBlogs(newBlogs);
+    }
+
+    return (  
+        <div className="home">
+            <h2>Home Page</h2>
+            <BlogList blogs={blogs} title = "All Blogs!!!" handleDelete={handleDelete}/>
+            <BlogList blogs={blogs.filter((blog)=>(blog.author === 'mario'))} title = "Mario's Blogs!!!" handleDelete={handleDelete} />
+        </div>
+    );
+}
+ 
+export default Home;
+
+In the above code a new variable is initialized in the handleDelete function which filters the list of data so that the id which corresponds to the blog which is deleted is removed from the page and state is changed using the setBlogs function.
+
+Then a new parameter is added in the BlogList component which is the handleDelete function.
+
+Of course we have to add the prop handleDelete in BlogList.js as parameter with blogs and title
+
+
