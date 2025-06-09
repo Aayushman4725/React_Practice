@@ -422,4 +422,520 @@ Then a new parameter is added in the BlogList component which is the handleDelet
 
 Of course we have to add the prop handleDelete in BlogList.js as parameter with blogs and title
 
+useEffect
+this hook runs a code every time a page is rendered(reload)
+
+
+For eg:
+import { useState, useEffect } from "react";
+import BlogList from "./BlogList";
+
+const Home = () => {
+    const [blogs, setBlogs] = useState([
+        { title: 'My new website', body: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.', author: 'mario', id: 1 },
+        { title: 'Welcome party!', body: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.', author: 'yoshi', id: 2 },
+        { title: 'Web dev top tips', body: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.', author: 'mario', id: 3 }
+    ]);
+
+    const handleDelete = (id) => {
+        const newBlogs = blogs.filter(blog => blog.id !== id);
+        setBlogs(newBlogs);
+    }
+
+    useEffect(()=>{
+        console.log('useEffect ran');
+        console.log(blogs);
+    })
+
+    return (  
+        <div className="home">
+            <h2>Home Page</h2>
+            <BlogList blogs={blogs} title = "All Blogs!!!" handleDelete={handleDelete}/>
+            <BlogList blogs={blogs.filter((blog)=>(blog.author === 'mario'))} title = "Mario's Blogs!!!" handleDelete={handleDelete} />
+        </div>
+    );
+}
+ 
+export default Home;
+
+in this code every time I reload the page or every time the page is rendered the useEffect hook runs and the code inside it initiates.
+When a button is clicked or when the page is reloaded the code runs and prints in console.
+
+Dependencies
+Now for useEffect hook to only run when rendering the page at start or only in a certain condition then we use useEffect dependencies which is essentially an array of which variable should be taken into consideration to run the useEffect hook.
+
+For eg: If I only want to run the useEffect when rendered at start then I can leave an empty array
+
+import { useState, useEffect } from "react";
+import BlogList from "./BlogList";
+
+const Home = () => {
+    const [blogs, setBlogs] = useState([
+        { title: 'My new website', body: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.', author: 'mario', id: 1 },
+        { title: 'Welcome party!', body: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.', author: 'yoshi', id: 2 },
+        { title: 'Web dev top tips', body: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.', author: 'mario', id: 3 }
+    ]);
+
+    const handleDelete = (id) => {
+        const newBlogs = blogs.filter(blog => blog.id !== id);
+        setBlogs(newBlogs);
+    }
+
+    useEffect(()=>{
+        console.log('useEffect ran');
+        console.log(blogs);
+    },[])
+
+    return (  
+        <div className="home">
+            <h2>Home Page</h2>
+            <BlogList blogs={blogs} title = "All Blogs!!!" handleDelete={handleDelete}/>
+            <BlogList blogs={blogs.filter((blog)=>(blog.author === 'mario'))} title = "Mario's Blogs!!!" handleDelete={handleDelete} />
+        </div>
+    );
+}
+ 
+export default Home;
+
+If I want to initiate the useEffect hook when I have clicked a specific button then the array should contain the variable whose state will be changed. 
+If the state of the variable changes then the useEffect hook will run.
+
+import { useState, useEffect } from "react";
+import BlogList from "./BlogList";
+
+const Home = () => {
+    const [blogs, setBlogs] = useState([
+        { title: 'My new website', body: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.', author: 'mario', id: 1 },
+        { title: 'Welcome party!', body: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.', author: 'yoshi', id: 2 },
+        { title: 'Web dev top tips', body: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.', author: 'mario', id: 3 }
+    ]);
+    const [name,setName] = useState('mario');
+    const handleDelete = (id) => {
+        const newBlogs = blogs.filter(blog => blog.id !== id);
+        setBlogs(newBlogs);
+    }
+
+    useEffect(()=>{
+        console.log('useEffect ran');
+        console.log(blogs);
+        console.log(name);
+    },[name]);
+
+    return (  
+        <div className="home">
+            <h2>Home Page</h2>
+            <BlogList blogs={blogs} title = "All Blogs!!!" handleDelete={handleDelete}/>
+            <BlogList blogs={blogs.filter((blog)=>(blog.author === 'mario'))} title = "Mario's Blogs!!!" handleDelete={handleDelete} />
+                <button onClick = {()=>setName('luigi')} >Change Name</button>
+            <p>{ name }</p>
+            
+        </div>
+    );
+}
+ 
+export default Home;
+
+json server
+npx json-server --watch data/db.json --port 8000
+
+Now that we know about useEffect.
+We can fetch json data from the server and run the useEffect to fetch it once at the start when the page is rendered
+
+The above code runs a demo server that fetch data stored in data folder inside db.json file and then run in port 8000
+
+##Fetching data from the json server
+Once we run the server with this code : npx json-server --watch data/db.json --port 8000
+
+we use the fetch function or api inside the useEffect hook to fetch the data from the server using the url endpoint provided by the server :         fetch('http://localhost:8000/blogs')
+After that we use .then to return the response object (res) to convert the data into javascript object format using json() as:
+
+.then(res => {
+                return res.json();
+            })
+
+After that finally we fetch the data, data being the object and we use setBlogs function to render the object: 
+.then(data => {
+                setBlogs(data);
+                console.log(data);
+            })
+
+The complete code:
+
+import { useState, useEffect } from "react";
+import BlogList from "./BlogList";
+
+const Home = () => {
+    const [blogs, setBlogs] = useState(null);
+    
+
+    useEffect(()=>{
+        
+        fetch('http://localhost:8000/blogs')
+            .then(res => {
+                return res.json();
+            })
+            .then(data => {
+                setBlogs(data);
+                console.log(data);
+            })
+    },[]);
+
+    return (  
+        <div className="home">
+            <h2>Home Page</h2>
+           {blogs && <BlogList blogs={blogs} title = "All Blogs!!!" />}
+            {/* <BlogList blogs={blogs.filter((blog)=>(blog.author === 'mario'))} title = "Mario's Blogs!!!" handleDelete={handleDelete} /> */}
+        </div>
+    );
+}
+ 
+export default Home;
+
+In the code the BlogList component is wrapped in curly braces with the ampersand sign. This is a javacript code which means if the blogs return 0 which is the left side of the code then the right side wont work. 
+This is called Conditional template
+So when the data is fetched the blogs should return 1 only then will the component run.
+Also  the blogs is set as null in useState. When the data is fetched using the setBlogs the null is replaced with the data then the code below return runs.
+
+#Conditional template 
+As explained above in conditional template if the left side of the code is not true then the right side of the code wont work.
+So, lets try to add loading sign.
+when the data is being fetched a loading sign will show and when the data is fetched completely the sign disappears.
+This can be done by initiating a isPending Boolean variable with the setIsPending function in useState hook.
+Initially the value will be true .
+Then, in the useEffect hook when the data is fetched the setBlogs function runs to replace the null with data the isPending variable will be set to false.
+
+The conditional template is used to show the loading sign.
+Since , inititally the isPending variable is true the loading will show, but when the data is fetched the useEffect hook runs the setIsPending function to set the value to false then the conditional template will see the isPending variable as false and the right side of the code wont work.
+
+Code :
+
+import { useState, useEffect } from "react";
+import BlogList from "./BlogList";
+
+const Home = () => {
+    const [blogs, setBlogs] = useState(null);
+    const[isPending, setIsPending] = useState(true);
+    
+
+    useEffect(()=>{
+        setTimeout(() => {
+             fetch('http://localhost:8000/blogs')
+            .then(res => {
+                return res.json();
+            })
+            .then(data => {
+                setBlogs(data);
+                console.log(data);
+                setIsPending(false);
+            })
+        }, 1000)
+       
+    },[]);
+
+    return (  
+        <div className="home">
+            {isPending && <div>Loading...</div>}
+           {blogs && <BlogList blogs={blogs} title = "All Blogs!!!" />}
+            {/* <BlogList blogs={blogs.filter((blog)=>(blog.author === 'mario'))} title = "Mario's Blogs!!!" handleDelete={handleDelete} /> */}
+        </div>
+    );
+}
+ 
+export default Home;
+
+
+setTimeout function is used to delay the fetch by 1 sec to make the loading more realistic(don't use it in real project)
+
+Error display
+So, when the server or api encounters an error the user should know the type of error they are facing.
+For that we use catch which will display the error message if there is any error or if other functions throw some error.
+
+For eg: 
+
+import { useState, useEffect } from "react";
+import BlogList from "./BlogList";
+
+const Home = () => {
+    const [blogs, setBlogs] = useState(null);
+    const[isPending, setIsPending] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(()=>{
+        setTimeout(() => {
+             fetch('http://localhost:8000/blogs')
+            .then(res => {
+                if(!res.ok){
+                    throw Error('Could not fetch the data for that resource');
+                }
+                return res.json();
+            })
+            .then(data => {
+                setBlogs(data);
+                console.log(data);
+                setIsPending(false);
+                setError(null);
+            })
+            .catch(err => {
+                setError(err.message);
+                setIsPending(false);
+            })
+        }, 1000);
+       
+    },[]);
+
+    return (  
+        <div className="home">
+            {error && <div>{error}</div>}
+            {isPending && <div>Loading...</div>}
+           {blogs && <BlogList blogs={blogs} title = "All Blogs!!!" />}
+            {/* <BlogList blogs={blogs.filter((blog)=>(blog.author === 'mario'))} title = "Mario's Blogs!!!" handleDelete={handleDelete} /> */}
+        </div>
+    );
+}
+ 
+export default Home;
+
+Custom Hook
+
+Now that we have used useEffect hook to render the data in the page by fetching it from the server, what if we have other data that can be fetched. For eg if I want to fetch data from Api that sends list of students.
+
+For this I would have to write the code for the useEffect again and again.
+
+But what if we make this whole process a hook and call it whenever necessary.
+
+For this we would have to create a new js file which I have named useFetch.js 
+Remember, every time we make a custom hook we have to start with the prefic 'use'
+
+Now in this useFetch.js we will create a arrow function naming it useFetch and inside the function we put the whole useEffect code.
+In the fetch api we will remove the hard coded url.
+Instead we will put a dynamic variable url as an argument and the useFetch function will also have the url parameter.
+Now every time the useFetch hook is called we put the api endpoint url as the parameter and in default the hook will respond with the data,isPending and error variables.
+
+Code :
+useFetch.js
+
+import { useState, useEffect } from "react";
+
+   
+const useFetch = (url) => {
+
+    const [data, setData] = useState(null);
+    const[isPending, setIsPending] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(()=>{
+            setTimeout(() => {
+                 fetch(url)
+                .then(res => {
+                    if(!res.ok){
+                        throw Error('Could not fetch the data for that resource');
+                    }
+                    return res.json();
+                })
+                .then(data => {
+                    setData(data);
+                    console.log(data);
+                    setIsPending(false);
+                    setError(null);
+                })
+                .catch(err => {
+                    setError(err.message);
+                    setIsPending(false);
+                })
+            }, 1000);
+           
+        },[url]);
+
+        return {data, isPending, error};
+}
+
+export default useFetch;
+
+-------------------------------------------------------------------------------------------------------------------------------------
+
+Home.js
+
+import BlogList from "./BlogList";
+import useFetch from "./useFetch";
+const Home = () => {
+    
+   const {data:blogs, isPending, error} = useFetch('http://localhost:8000/blogs');
+
+    return (  
+        <div className="home">
+            {error && <div>{error}</div>}
+            {isPending && <div>Loading...</div>}
+           {blogs && <BlogList blogs={blogs} title = "All Blogs!!!" />}
+            {/* <BlogList blogs={blogs.filter((blog)=>(blog.author === 'mario'))} title = "Mario's Blogs!!!" handleDelete={handleDelete} /> */}
+        </div>
+    );
+}
+ 
+export default Home;
+
+In the above code the useFetch hook will send the data as variable named data but since we know that the data will be blogs we wrapped the naming of data with blogs use the colon (:) sign as data:blogs.
+
+
+##React Router
+
+npm install react-router-dom@5
+
+The above code install the react router
+
+When a client sends request to the server it responds with index.html
+If the client wants any other url the server responds with the corresponding page but it causes a lot of load in the server.
+
+If we use the react router ,initially when the client sends the request the server responds with js bundle file along with the index.html page 
+
+The js bundle file will contain all the components that have been in react.
+
+When the client request another data the js bundle stops the request from going to the server and sends the response it self since it already contain the component required.
+
+For this we work in the root folder which is the App.js file
+
+For eg:
+
+import NavBar from "./NavBar";
+import Home from "./Home";
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom/cjs/react-router-dom.min";
+
+
+function App() {
+  return (
+   <Router>
+    <div className="content">
+       <NavBar></NavBar>
+      <h1>App Component</h1>
+      <Switch>
+        <Route path = "/">
+          <Home />
+        </Route>
+
+      </Switch>
+    </div>
+    </Router>
+  );
+}
+
+export default App;
+
+
+Similarly if we want to create more pages we add the router in the App.js
+But when using the path we add the word 'exact' before it to make sure that it doesn't mix the path
+
+for eg if the path we want to go is /create but there is path already containing / then instead of going to /create it will go to /.
+So, we use the keyword exact so that user is explicitly asked to only have / as path to go to home.
+
+For eg
+import NavBar from "./NavBar";
+import Home from "./Home";
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom/cjs/react-router-dom.min";
+import Create from "./Create";
+
+function App() {
+  return (
+   <Router>
+    <div className="content">
+       <NavBar></NavBar>
+      <h1>App Component</h1>
+      <Switch>
+        <Route exact path = "/">
+          <Home />
+        </Route>
+        <Route path = "/create">
+          <Create />
+        </Route>
+
+      </Switch>
+    </div>
+    </Router>
+  );
+}
+
+export default App;
+
+Route Link
+
+Even though we have set the router the server still sends the data every time the client requests it.
+For react to intercept the request sent by the client we need a component called Link which see the path to which the button corresponds to and searches for that path in the App.js component and after that the react injects the component to the page
+
+For eg:
+
+import { Link } from 'react-router-dom';
+
+const NavBar = () => {
+  return (
+    <div className="NavBar">
+      <h1>Dojo Blog</h1>
+      <nav>
+        
+        <div className="links">
+          <Link to="/">Home</Link>
+          <Link to = "/create">New Blog</Link>
+        </div>
+      </nav>
+    </div>
+  );
+};
+
+export default NavBar;
+
+
+useEffect cleanup
+
+If we change the page when the fetch operation is initiated but not complete then we get an error as the page which performs the fetch operation is already unmounted or closed when next page is clicked.
+
+To prevent the error from showing we use AbortController to throw an error which will be caught by the api in useEffect hook but since the error will still show even if it is caught we if the conditional statement.
+
+for eg:
+
+
+import { useState, useEffect } from "react";
+
+   
+const useFetch = (url) => {
+
+    const [data, setData] = useState(null);
+    const[isPending, setIsPending] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(()=>{
+            const abortCont = new AbortController();
+            setTimeout(() => {
+                 fetch(url, {signal: abortCont.signal})
+                .then(res => {
+                    if(!res.ok){
+                        throw Error('Could not fetch the data for that resource');
+                    }
+                    return res.json();
+                })
+                .then(data => {
+                    setData(data);
+                    console.log(data);
+                    setIsPending(false);
+                    setError(null);
+                })
+                .catch(err => {
+                    if(err.name === 'AbortError'){
+                        console.log('Fetch aborted');
+                    }else{
+                        setError(err.message);
+                        setIsPending(false);
+                    }
+                    
+                })
+            }, 1000);
+           
+            return () => abortCont.abort();
+        },[url]);
+
+        return {data, isPending, error};
+}
+
+export default useFetch;
+
+
+
+
+
 
